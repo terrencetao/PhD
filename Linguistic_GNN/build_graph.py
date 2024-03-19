@@ -95,7 +95,10 @@ if __name__ == "__main__":
         
     dataset = load_pickle(os.path.join(input_folder,"partial_graph.pkl"))
     
-    dataset.graph.ndata['feat'] = torch.eye(len(dataset.word_to_id)-1)
+    try:
+        dataset.graph.ndata['feat'] = torch.eye(len(dataset.word_to_id)-1)
+    except:
+        dataset.graph.ndata['feat'] = torch.eye(len(dataset.word_to_id))
    
     graph_labels = {"glabel": torch.tensor([0])}
     save_graphs(os.path.join(input_folder,"origin_word_graph_data.bin"),[dataset[0]] , graph_labels)
