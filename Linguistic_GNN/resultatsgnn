@@ -1,0 +1,4 @@
+,correlation,p-value,filepath
+0,0.3,0.6238376647810728,word_similarity_dataset/wordsim353_sim_rel/wordsim_similarity_goldstandard.txt
+1,0.39999999999999997,0.6,word_similarity_dataset/wordsim353_sim_rel/wordsim_relatedness_goldstandard.txt
+2,,,ConceptSim_dataset/ConceptSim/MC_word.txt

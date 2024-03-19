@@ -1,0 +1,23 @@
+name: gnn
+channels:
+  - defaults
+dependencies:
+  - python
+  - numpy=1.18.1
+  - pandas=1.0.1
+  - scikit-learn=0.22.1
+  - nltk
+  - networkx
+  - matplotlib
+  - d2l
+  - dgl
+  - apache_beam==mwparserfromhell
+  - datasets
+  - tqdm
+  - pickle
+  - torch
+  - itertools
+  - scipy
+  - node2vec
+  - gensim
+
