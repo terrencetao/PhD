@@ -96,7 +96,7 @@ def compute_auc(pos_score, neg_score):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_folder', help ='source folder')
-    parser.add_argument('--number_sentence', help='number of sentence to extract in dataset')
+   
     #parser.add_argument('--output_folder', help ='output folder')
     args = parser.parse_args()
     
