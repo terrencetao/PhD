@@ -1,6 +1,6 @@
 python3 data_processing.py --input_folder '' --number_sentence 5000
 
-python3 word2vec_model.py --input_folder 
+python3 word2vec_model.py --input_folder ''
 
 python3 build_graph.py --input_folder ''
 
