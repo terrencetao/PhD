@@ -182,10 +182,17 @@ if __name__ == "__main__":
     word_to_vec={}
     node_features = h.detach().numpy()
 
-    id_to_word = load_pickle(file_path=os.path.join(input_folder,'id_to_word.pkl'))
-
-    for i in train_g.nodes().numpy():
-       word_to_vec[id_to_word[i]] = node_features[i]
+    #id_to_word = load_pickle(file_path=os.path.join(input_folder,'id_to_word.pkl'))
+    words = load_pickle(file_path=os.path.join(input_folder,'vocabulary.pkl'))
+    word_to_node = load_pickle(file_path=os.path.join(input_folder,'word_to_node.pkl'))
+    
+    for word in words:
+       node_index = word_to_node.get(word, -1)
+       if node_index!=-1:
+          word_to_vec[word]=node_features[node_index]
+          
+    #for i in train_g.nodes().numpy():
+    #   word_to_vec[id_to_word[i]] = node_features[i]
 
 
 

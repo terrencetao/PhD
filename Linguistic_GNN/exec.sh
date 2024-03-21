@@ -1,4 +1,4 @@
-python3 data_processing.py --input_folder '' --number_sentence 15000
+python3 data_processing.py --input_folder '' --number_sentence 500
 
 python3 word2vec_model.py --input_folder ''
 

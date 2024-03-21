@@ -54,7 +54,8 @@ class WordContextDataset(dgl.data.DGLDataset):
                   for context_word in context_words:
                     if context_word in self.vocabulary:
                       add_word(context_word)
-                      graph.add_edge(word_to_id[word], word_to_id[context_word])
+                      #graph.add_edge(word_to_id[word], word_to_id[context_word])
+                      graph.add_edge(word, context_word)
 
         # Convert the NetworkX graph to a DGL graph
         self.graph = dgl.DGLGraph(graph)
@@ -62,11 +63,8 @@ class WordContextDataset(dgl.data.DGLDataset):
         # Store word-to-ID and ID-to-word mappings as attributes of the dataset
         self.word_to_id = word_to_id
         self.id_to_word = id_to_word
-        # assert len(self.id_to_word) != len(self.vocabulary), "gnn vec and w2v vocabalary cannot have the same size"
-        # Create one-hot encoding for each word and store in 'feat' attribute
-        #self.graph.ndata['feat'] = torch.eye(len(self.word_to_id)-1)
-        # self.graph.ndata['feat'] = torch.eye(39085)
-
+        self.word_to_node = {word:node_index for node_index, word in enumerate(graph.nodes)}
+        
     def __getitem__(self, idx):
         return self.graph
 
@@ -106,4 +104,6 @@ if __name__ == "__main__":
 
     save_pickle(data=dataset.id_to_word , file_path=os.path.join(input_folder,'id_to_word.pkl'))
     save_pickle(data=dataset.word_to_id , file_path=os.path.join(input_folder,'word_to_id.pkl'))
+   
+    save_pickle(data=dataset.word_to_node , file_path=os.path.join(input_folder,'word_to_node.pkl'))
 
