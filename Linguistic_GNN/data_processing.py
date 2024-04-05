@@ -1,11 +1,11 @@
-from d2l import torch as d2l
+#from d2l import torch as d2l
 import pickle
 import os
 import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
-                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
+#d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip',
+#                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
 import re
 import string
 import nltk

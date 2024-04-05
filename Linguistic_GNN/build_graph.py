@@ -54,8 +54,8 @@ class WordContextDataset(dgl.data.DGLDataset):
                   for context_word in context_words:
                     if context_word in self.vocabulary:
                       add_word(context_word)
-                      #graph.add_edge(word_to_id[word], word_to_id[context_word])
-                      graph.add_edge(word, context_word)
+                      graph.add_edge(word_to_id[word], word_to_id[context_word])
+                      #graph.add_edge(word, context_word)
 
         # Convert the NetworkX graph to a DGL graph
         self.graph = dgl.DGLGraph(graph)
