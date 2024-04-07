@@ -2,12 +2,23 @@ import os
 import pickle
 import tarfile
 from scipy.spatial.distance import cosine
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, permutation_test
 from data_processing import load_pickle, save_pickle
 import pandas as pd
 import argparse 
 
+def correlation(x,y):  # explore all possible pairings by permuting `x`
+   # Calculate the observed Spearman correlation coefficient
+   observed_rho_spear, p_value_spear = spearmanr(x, y, alternative='greater')
 
+# Perform permutation test
+   num_permutations = 1000
+   res = permutation_test((x, y), statistic=lambda x, y: spearmanr(x, y)[0], n_resamples=num_permutations, alternative='greater')
+   observed_rho_perm, p_value_perm, _ = res.statistic, res.pvalue, res.null_distribution
+
+
+   
+   return observed_rho_spear, p_value_spear, observed_rho_perm, p_value_perm
 
 
 parser = argparse.ArgumentParser()
@@ -74,11 +85,15 @@ for fp in file_path:
   computed_similarity_scores = [1 - cosine(word_vectors[word1], word_vectors[word2]) for word1, word2 in word_pairs if word1 in word_vectors and word2  in word_vectors ]
 
   # Calculate Spearman correlation between computed and human similarity scores
-  correlation_coefficient, p_value = spearmanr(computed_similarity_scores, human_similarity_scores)
+  #correlation_coefficient, p_value = spearmanr(computed_similarity_scores, human_similarity_scores)
+  observed_rho_spear, p_value_spear, observed_rho_perm, p_value_perm = correlation(computed_similarity_scores, human_similarity_scores)
 
-  print(f"Spearman Correlation: {correlation_coefficient} for dataset {dataset_file_path} ")
-
+  print(f"Spearman Correlation: {observed_rho_spear} for dataset {dataset_file_path} ")
+  print(f"permutation Correlation: {observed_rho_perm} for dataset {dataset_file_path} ")
   print("----------------------------------------------------------------------------------------------------------")
-  resultat.append((correlation_coefficient, p_value, dataset_file_path))
-df= pd.DataFrame(data=resultat, columns= ['correlation', 'p-value','filepath'])
-df.to_csv(os.path.join(input_folder,f'resultats{model}'))
+  resultat.append((observed_rho_spear, p_value_spear, observed_rho_perm, p_value_perm, len(word_pairs), dataset_file_path))
+df= pd.DataFrame(data=resultat, columns= ['correlation spearman', 'p-value spearman','correlation permutation','p-value-permutation-test','nb-word','filepath'])
+with open(os.path.join(input_folder,f'resultats{model}'), 'a', newline='') as f:
+    df.to_csv(f, header=f.tell()==0, index=False)
+
+

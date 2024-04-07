@@ -187,7 +187,7 @@ if __name__ == "__main__":
    
     
     
-    for word, id_ in word_to_id:
+    for word, id_ in word_to_id.items():
        word_to_vec[word] = node_features[id_]
 
 
