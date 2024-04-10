@@ -10,5 +10,5 @@ input_folder = args.input_folder
 
 data = load_dataset("wikipedia", "20220301.simple")
 
-save_pickle(data=dataset, file_path=os.path.join(input_folder,'wiki235.pkl'))
+save_pickle(data=datA, file_path=os.path.join(input_folder,'wiki235.pkl'))
 
