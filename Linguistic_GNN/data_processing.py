@@ -13,6 +13,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import argparse 
+import random
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -71,12 +72,13 @@ if __name__ == "__main__":
 
     dataset = load_pickle(file_path=os.path.join(input_folder,'wiki235.pkl'))
 
-    dataset= dataset['train']['text'][:nb_sent]
+    # Extract random nb_sent sentences from the dataset
+    random_text = random.sample(dataset['train']['text'], nb_sent)
 
     sentences = []
-    for raw_text in dataset:
+    for raw_text in random_text:
        sentences.extend([clean_text(line) for line in raw_text.split('\n\n')])
-    print(sentences[0])
+    print(len(sentences))
     sentences = [word_tokenize(sentence) for sentence in sentences]
 
     save_pickle(data= sentences, file_path=os.path.join(input_folder,'sentences.pkl'))

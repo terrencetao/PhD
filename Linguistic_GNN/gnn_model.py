@@ -139,8 +139,8 @@ if __name__ == "__main__":
 
     model = GraphSAGE(train_g.ndata['feat'].shape[1], 50)
 # You can replace DotPredictor with MLPPredictor.
-    pred = MLPPredictor(50)
-# pred = DotPredictor()
+    #pred = MLPPredictor(50)
+    pred = DotPredictor()
 
 
 
@@ -182,13 +182,15 @@ if __name__ == "__main__":
     word_to_vec={}
     node_features = h.detach().numpy()
 
-    word_to_id = load_pickle(file_path=os.path.join(input_folder,'word_to_id.pkl'))
+    id_to_word = load_pickle(file_path=os.path.join(input_folder,'id_to_word.pkl'))
     words = load_pickle(file_path=os.path.join(input_folder,'vocabulary.pkl'))
    
     
     
-    for word, id_ in word_to_id.items():
-       word_to_vec[word] = node_features[id_]
+    
+
+    for i in train_g.nodes().numpy():
+      word_to_vec[id_to_word[i]] = node_features[i]
 
 
 

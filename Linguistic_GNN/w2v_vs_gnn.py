@@ -91,8 +91,10 @@ for fp in file_path:
   print(f"Spearman Correlation: {observed_rho_spear} for dataset {dataset_file_path} ")
   print(f"permutation Correlation: {observed_rho_perm} for dataset {dataset_file_path} ")
   print("----------------------------------------------------------------------------------------------------------")
-  resultat.append((observed_rho_spear, p_value_spear, observed_rho_perm, p_value_perm, len(word_pairs), dataset_file_path))
-df= pd.DataFrame(data=resultat, columns= ['correlation spearman', 'p-value spearman','correlation permutation','p-value-permutation-test','nb-word','filepath'])
+  words = load_pickle(file_path=os.path.join(input_folder,'vocabulary.pkl'))
+  sentences = load_pickle(file_path=os.path.join(input_folder,'sentences.pkl'))
+  resultat.append((observed_rho_spear, p_value_spear, observed_rho_perm, p_value_perm, len(word_pairs), len(words), len(sentences),dataset_file_path))
+df= pd.DataFrame(data=resultat, columns= ['correlation spearman', 'p-value spearman','correlation permutation','p-value-permutation-test','nb-word','nb_vocab','nb_sent','filepath'])
 with open(os.path.join(input_folder,f'resultats{model}'), 'a', newline='') as f:
     df.to_csv(f, header=f.tell()==0, index=False)
 

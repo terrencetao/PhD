@@ -1,4 +1,4 @@
-for i in $(seq 100 100 1500); do
+for i in $(seq 100 25 2000); do
 
   rm origin_word_graph_data.bin partial_graph.pkl sentences.pkl 
   python3 data_processing.py --input_folder '' --number_sentence $i
