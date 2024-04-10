@@ -1,6 +1,7 @@
 from datasets import load_dataset
 from data_processing import load_pickle, save_pickle
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_folder', help ='source folder')
