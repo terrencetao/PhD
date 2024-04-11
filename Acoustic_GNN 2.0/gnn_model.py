@@ -7,28 +7,68 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from dgl.data.utils import load_graphs
 import argparse 
+import os
+import pickle
+from sklearn.preprocessing import LabelEncoder
 
-# Define the CNN model
+import torch
+import torch.nn as nn
+import networkx as nx
+import dgl
+
 class CNN(nn.Module):
-    def __init__(self, in_channels, conv_param):
+    def __init__(self, conv_param, hidden_units):
         super(CNN, self).__init__()
-        layers = []
-        in_channels = in_channels
-        for i in range(len(conv_param) - 1):
-            layers.append(nn.Conv1d(in_channels=conv_param[i], out_channels=conv_param[i+1], kernel_size=3, padding=1))
-            layers.append(nn.ReLU())
-            in_channels = conv_param[i+1]
-        self.conv = nn.Sequential(*layers)
+        self.conv1 = nn.Conv2d(in_channels=conv_param[0][0], out_channels=conv_param[1], kernel_size=conv_param[0][1], padding='same')
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=conv_param[2])
+        self.flatten = nn.Flatten()
+        self.input_shape = conv_param[0][2]
+
+        # Détermination de la taille de l'entrée des couches linéaires
+        num_conv_features = self._calculate_conv_features(conv_param)
+        self.linear_layers = self._create_linear_layers(num_conv_features, hidden_units)
 
     def forward(self, x):
-        return self.conv(x)
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+
+        # Appliquer les couches linéaires
+        for layer in self.linear_layers:
+            x = layer(x)
+            x = self.relu(x)
+        return x
+
+   
+    def _calculate_conv_features(self, conv_param):
+        # Calculer le nombre de caractéristiques extraites par les couches de convolution
+        dummy_input = torch.zeros((1,conv_param[0][0], *self.input_shape))  # Exemple d'entrée (taille arbitraire)
+        conv_output = self.conv1(dummy_input)
+        conv_output = self.relu(conv_output)
+        conv_output = self.pool(conv_output)
+        conv_output = self.flatten(conv_output)
+        return conv_output.size(1)
+       
+
+    def _create_linear_layers(self, num_conv_features, hidden_units):
+        # Créer des couches linéaires en fonction du nombre de caractéristiques extraites par les couches de convolution
+        layers = []
+        for i in range(len(hidden_units)):
+            if i == 0:
+                layers.append(nn.Linear(num_conv_features, hidden_units[i]))
+            else:
+                layers.append(nn.Linear(hidden_units[i-1], hidden_units[i]))
+        return nn.ModuleList(layers)
+
 
 # Define the GCN model
 class GCN(nn.Module):
-    def __init__(self, in_feats, hidden_size, num_classes, conv_param):
+    def __init__(self, in_feats, hidden_size, num_classes, conv_param,hidden_units):
         super(GCN, self).__init__()
-        self.cnn = CNN(in_channels=conv_param[0], conv_param=conv_param)
-        self.conv1 = SAGEConv(conv_param[-1], hidden_size, 'mean')
+        self.cnn = CNN(conv_param=conv_param, hidden_units=hidden_units)
+        self.conv1 = SAGEConv(hidden_units[-1], hidden_size, 'mean')
         self.conv2 = SAGEConv(hidden_size, num_classes, 'mean')
 
     def forward(self, g, features):
@@ -89,20 +129,42 @@ input_folder = args.input_folder
 
 
 glist, label_dict = load_graphs(os.path.join(input_folder,"origin_word_graph_data.bin"))
-dgl_graph = glist[0]  
+dgl_G = glist[0]  
+
+with open(os.path.join(input_folder, 'dataset.pl'), 'rb') as file:
+    data = pickle.load(file)
+
+data = data
 
 # Initialize the GCN model
 in_feats = dgl_G.ndata['features'].shape[1]
 hidden_size = 64
 num_classes = len(data['label'].unique())  # Number of unique labels
-conv_param = [1, 3, 32]  # CNN parameters: [input_channels, hidden_channels, output_channels]
-model = GCN(in_feats, hidden_size, num_classes, conv_param)
+conv_param = [
+    # Paramètres de la première couche de convolution
+    (1, 3, (20,64)),  # Tuple: (nombre de canaux d'entrée, taille du noyau, forme de l'entrée)
+    32,
+    # Paramètres de la couche de pooling
+    (2)
+]
+
+
+hidden_units = [32, 32]
+model = GCN(in_feats, hidden_size, num_classes, conv_param, hidden_units)
 
 
 
 # Train the model
 features = dgl_G.ndata['features']
-labels = torch.tensor(data['label'].values)
+# Initialize LabelEncoder
+label_encoder = LabelEncoder()
+
+# Encode the labels
+data['label_encoded'] = label_encoder.fit_transform(data['label'])
+
+# Convert the encoded labels to a tensor
+labels = torch.tensor(data['label_encoded'].values)
+
 train(model, dgl_G, features, labels)
 
 # Define the file path for saving the model
@@ -118,6 +180,10 @@ torch.save(model.state_dict(), model_path)
 
 # Train the model with topological loss
 # Assume adj_matrix is the adjacency matrix of the graph
-adj_matrix = torch.tensor(nx.to_numpy_matrix(G))
+adj_matrix = torch.tensor(nx.to_numpy_matrix(dgl.to_networkx(dgl_G)))
+
+adj_matrix = adj_matrix.float()
+features = features.float()
 train_with_topological_loss(model, dgl_G, features, adj_matrix)
 model_path_sup = os.path.join(input_folder,"gnn_model_unsup.pth")
+torch.save(model.state_dict(), model_path_sup)
