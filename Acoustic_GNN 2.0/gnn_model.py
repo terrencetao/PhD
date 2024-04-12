@@ -134,7 +134,7 @@ dgl_G = glist[0]
 with open(os.path.join(input_folder, 'dataset.pl'), 'rb') as file:
     data = pickle.load(file)
 
-data = data[:1000]
+data = data
 
 # Initialize the GCN model
 in_feats = dgl_G.ndata['features'].shape[1]
