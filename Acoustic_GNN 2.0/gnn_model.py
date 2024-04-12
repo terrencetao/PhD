@@ -150,7 +150,8 @@ conv_param = [
 
 
 hidden_units = [32, 32]
-model = GCN(in_feats, hidden_size, num_classes, conv_param, hidden_units)
+model1 = GCN(in_feats, hidden_size, num_classes, conv_param, hidden_units)
+model2 = GCN(in_feats, hidden_size, num_classes, conv_param, hidden_units)
 
 
 
@@ -165,13 +166,13 @@ data['label_encoded'] = label_encoder.fit_transform(data['label'])
 # Convert the encoded labels to a tensor
 labels = torch.tensor(data['label_encoded'].values)
 
-train(model, dgl_G, features, labels)
+train(model1, dgl_G, features, labels)
 
 # Define the file path for saving the model
 model_path = os.path.join(input_folder,"gnn_model.pth")
 
 # Save the model
-torch.save(model.state_dict(), model_path)
+torch.save(model1.state_dict(), model_path)
 
 
 
@@ -184,6 +185,6 @@ adj_matrix = torch.tensor(nx.to_numpy_matrix(dgl.to_networkx(dgl_G)))
 
 adj_matrix = adj_matrix.float()
 features = features.float()
-train_with_topological_loss(model, dgl_G, features, adj_matrix)
+train_with_topological_loss(model2, dgl_G, features, adj_matrix)
 model_path_sup = os.path.join(input_folder,"gnn_model_unsup.pth")
 torch.save(model.state_dict(), model_path_sup)
