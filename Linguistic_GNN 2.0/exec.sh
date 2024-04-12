@@ -1,6 +1,6 @@
 rm resultatsgnn resultatsw2v
 
-for i in $(seq 1000 1000 20000); do
+for i in $(seq 1000 500 5000); do
 
   python3 data_processing.py --input_folder '' --number_sentence $i
 
