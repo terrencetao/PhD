@@ -23,7 +23,7 @@ def build_graph(data, threshold, alpha):
     for i, (index, row) in enumerate(data.iterrows()):
         G.add_node(row['ids'], features=row['mfcc_feautres'])
 
-    for i, (index1, row1) in enumerate(data.iterrows()):
+    for i, (index1, row1) in tqdm.tqdm(enumerate(data.iterrows())):
         for j, (index2, row2) in enumerate(data.iterrows()):
             if index1 != index2:
                 distance = dist_matrix[i][j]
@@ -67,9 +67,7 @@ threshold = 1000
 alpha = 20
 
 with open(os.path.join(input_folder, 'dataset.pl'), 'rb') as file:
-    data = pickle.load(file)
-
-data = data
+    datcdo
 
 # Build the graph
 G = build_graph(data, threshold, alpha)
