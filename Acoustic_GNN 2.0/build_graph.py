@@ -67,8 +67,9 @@ threshold = 1000
 alpha = 20
 
 with open(os.path.join(input_folder, 'dataset.pl'), 'rb') as file:
-    datcdo
+    data = pickle.load(file)
 
+data = data
 # Build the graph
 G = build_graph(data, threshold, alpha)
 

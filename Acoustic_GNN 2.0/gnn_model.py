@@ -134,7 +134,7 @@ dgl_G = glist[0]
 with open(os.path.join(input_folder, 'dataset.pl'), 'rb') as file:
     data = pickle.load(file)
 
-data = data
+data = data[:1000]
 
 # Initialize the GCN model
 in_feats = dgl_G.ndata['features'].shape[1]
@@ -187,4 +187,4 @@ adj_matrix = adj_matrix.float()
 features = features.float()
 train_with_topological_loss(model2, dgl_G, features, adj_matrix)
 model_path_sup = os.path.join(input_folder,"gnn_model_unsup.pth")
-torch.save(model.state_dict(), model_path_sup)
+torch.save(model2.state_dict(), model_path_sup)
